@@ -37,9 +37,15 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
     ? "Winner: " + winner
     : "Next player: " + (xIsNext ? "X" : "O");
 
+  const winnerStyle = !winner
+    ? { color: "black" }
+    : winner === "X"
+      ? { color: "green" }
+      : { color: "red" };
+
   return (
     <ThemedView>
-      <Text style={styles.status}>{status}</Text>
+      <Text style={{ ...styles.status, ...winnerStyle }}>{status}</Text>
       {[0, 3, 6].map((rowStart) => (
         <ThemedView key={rowStart} style={styles.boardRow}>
           {Array.from({ length: 3 }, (_, index) => (
@@ -59,21 +65,8 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
       >
         <Text style={styles.moveText}>Start new game</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          onPlay(Array(9).fill(null));
-        }}
-        style={styles.moveButton}
-      >
-        <Text style={styles.moveText}>Start new game with X</Text>
-      </TouchableOpacity>
     </ThemedView>
   );
-}
-
-function isBoardEmpty(squares: (string | null)[]): boolean {
-  return squares.every((square) => square === null);
 }
 
 export default function Game() {
@@ -83,25 +76,26 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const [xWins, setXWins] = useState(0);
   const [oWins, setOWins] = useState(0);
-  let xIsNext = currentMove % 2 === 0;
-
+  const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
   useEffect(() => {
-    // Randomly decide who starts the game
     const startsWithX = Math.random() < 0.5;
     xIsNext !== startsWithX && handlePlay(currentSquares);
   }, []);
 
+  function isBoardEmpty(squares: (string | null)[]): boolean {
+    return squares.every((square) => square === null);
+  }
+
   function handlePlay(nextSquares: (string | null)[]) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    const nextMove = isBoardEmpty(nextSquares)
-      ? Math.random() > 0.5
-        ? 0
-        : 1
-      : currentMove + 1;
     setHistory(nextHistory);
-    setCurrentMove(nextMove);
+    setCurrentMove(nextHistory.length - 1);
+
+    if (isBoardEmpty(nextSquares)) {
+      setCurrentMove(0);
+    }
 
     const winner = calculateWinner(nextSquares);
     if (winner === "X") {
