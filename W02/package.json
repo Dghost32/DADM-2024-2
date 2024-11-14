@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --tunnel",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -40,6 +40,8 @@
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~7.1.2",
     "jest": "^29.2.1",
     "jest-expo": "~51.0.3",
     "react-test-renderer": "18.2.0",
