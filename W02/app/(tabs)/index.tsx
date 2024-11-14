@@ -2,7 +2,7 @@ import Board from "@/components/Board";
 import { ThemedView } from "@/components/ThemedView";
 import calculateWinner from "@/utils/calculateWinner";
 import getBestMove from "@/utils/getBestMove";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, StyleSheet } from "react-native";
 
 export default function Game() {
