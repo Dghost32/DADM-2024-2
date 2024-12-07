@@ -49,7 +49,7 @@ export const GameProvider = ({ children }: PropsWithChildren) => {
   const playSound = async (uri: string) => {
     try {
       if (!metal) return;
-      const { sound, status } = await Audio.Sound.createAsync({
+      const { sound } = await Audio.Sound.createAsync({
         uri,
       });
       setSound(sound);
@@ -107,9 +107,9 @@ export const GameProvider = ({ children }: PropsWithChildren) => {
   // Automatically play "O" if it's the system's turn and the game is ongoing
   useEffect(() => {
     if (!metal) return;
-    playSound(metal[0].uri).then(() => {
-      new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
-        if (!xIsNext && !calculateWinner(currentSquares)) {
+    if (!xIsNext && !calculateWinner(currentSquares)) {
+      playSound(metal[0].uri).then(() => {
+        new Promise((resolve) => setTimeout(resolve, 1000)).then(() => {
           let bestMove: number;
 
           if (difficulty === "easy") {
@@ -123,9 +123,9 @@ export const GameProvider = ({ children }: PropsWithChildren) => {
           const nextSquares = currentSquares.slice();
           nextSquares[bestMove] = "O";
           handlePlay(nextSquares);
-        }
+        });
       });
-    });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMove, xIsNext, currentSquares]);
 
