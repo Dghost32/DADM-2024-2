@@ -7,6 +7,7 @@ import {
   FlatList,
   Alert,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
@@ -127,7 +128,7 @@ const App = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>Directorio de Empresas</Text>
       <View
         style={{
@@ -226,7 +227,7 @@ const App = () => {
           )}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
