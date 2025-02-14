@@ -1,83 +1,48 @@
-import Board from "@/components/Board";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { useGame } from "@/contexts/gameContext";
-import React, { useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
+import Board from "@/components/Board";
+import { useGame } from "@/contexts/gameContext";
+import BottomOptions from "@/components/BottomOptions";
 
 export default function Game() {
   const { xIsNext, currentSquares, handlePlay, oWins, xWins } = useGame();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
-  const [orientation, setOrientation] = useState(
-    ScreenOrientation.OrientationLock.PORTRAIT,
-  );
+  useEffect(() => {
+    (async () => {
+      await ScreenOrientation.unlockAsync();
+    })();
+  }, []);
 
   return (
-    <ThemedView
-      style={
-        orientation === ScreenOrientation.OrientationLock.PORTRAIT
-          ? styles.game
-          : stylesLandscape.game
-      }
-    >
-      <ThemedView
-        style={
-          orientation === ScreenOrientation.OrientationLock.PORTRAIT
-            ? styles.gameBoard
-            : stylesLandscape.gameBoard
-        }
-      >
-        <Pressable
-          onPress={() => {
-            if (orientation === ScreenOrientation.OrientationLock.PORTRAIT) {
-              ScreenOrientation.lockAsync(
-                ScreenOrientation.OrientationLock.LANDSCAPE,
-              );
-              setOrientation(ScreenOrientation.OrientationLock.LANDSCAPE);
-              console.log(orientation);
-            } else {
-              ScreenOrientation.lockAsync(
-                ScreenOrientation.OrientationLock.PORTRAIT,
-              );
-              setOrientation(ScreenOrientation.OrientationLock.PORTRAIT);
-              console.log(orientation);
-            }
-          }}
+    <>
+      <ThemedView style={isLandscape ? stylesLandscape.game : styles.game}>
+        <ThemedView
+          style={isLandscape ? stylesLandscape.gameBoard : styles.gameBoard}
         >
-          <ThemedText type="title">rotate</ThemedText>
-        </Pressable>
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+          <Board
+            xIsNext={xIsNext}
+            squares={currentSquares}
+            onPlay={handlePlay}
+          />
+        </ThemedView>
+        <ThemedView
+          style={isLandscape ? stylesLandscape.scoreBoard : styles.scoreBoard}
+        >
+          <ThemedText style={styles.scoreText} type="subtitle">
+            Player (X) Wins: {xWins}
+          </ThemedText>
+          <ThemedText style={styles.scoreText} type="subtitle">
+            Machine (O) Wins: {oWins}
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
-      <ThemedView
-        style={
-          orientation === ScreenOrientation.OrientationLock.PORTRAIT
-            ? styles.scoreBoard
-            : stylesLandscape.scoreBoard
-        }
-      >
-        <ThemedText
-          style={
-            orientation === ScreenOrientation.OrientationLock.PORTRAIT
-              ? styles.scoreText
-              : stylesLandscape.scoreText
-          }
-          type="subtitle"
-        >
-          Player (X) Wins: {xWins}
-        </ThemedText>
-        <ThemedText
-          style={
-            orientation === ScreenOrientation.OrientationLock.PORTRAIT
-              ? styles.scoreText
-              : stylesLandscape.scoreText
-          }
-          type="subtitle"
-        >
-          Machine (O) Wins: {oWins}
-        </ThemedText>
-      </ThemedView>
-    </ThemedView>
+      <BottomOptions hidden={isLandscape} />
+    </>
   );
 }
 

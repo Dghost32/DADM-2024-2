@@ -11,14 +11,33 @@ import {
 import { useGame } from "@/contexts/gameContext";
 import DifficultyModal from "../DifficultyModal";
 
-const BottomOptions = () => {
+type Props = {
+  hidden?: boolean;
+};
+
+const BottomOptions = ({ hidden }: Props) => {
   const { bottom } = useSafeAreaInsets();
   const { resetGame } = useGame();
   const [modalShown, setModalShown] = useState(false);
   const styles = getStyles(bottom);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={!hidden ? styles.container : {
+      //make it a sidebar on the right
+      ...styles.container,
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: undefined,
+      padding: 10,
+      paddingTop: 20,
+      paddingBottom: 20,
+      paddingHorizontal: 10,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+    }}>
       <Pressable
         style={styles.option}
         onPress={() => {

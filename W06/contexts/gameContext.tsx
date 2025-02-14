@@ -76,10 +76,12 @@ export const GameProvider = ({ children }: PropsWithChildren) => {
     initialValue: 0,
     key: "xWins",
   });
+
   const [oWins, setOWins] = useAsyncStorageState({
     initialValue: 0,
     key: "oWins",
   });
+
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 

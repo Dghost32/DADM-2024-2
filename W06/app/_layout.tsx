@@ -43,7 +43,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <Stack.Screen name="+not-found" />
         </Stack>
         {children}
-        <BottomOptions />
       </GameProvider>
     </ThemeProvider>
   );
