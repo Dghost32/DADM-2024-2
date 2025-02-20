@@ -11,6 +11,7 @@ import { ThemedText } from "@/components/ThemedText";
 import Board from "@/components/Board";
 import { supabase } from "@/utils/supabase";
 import BottomOptions from "@/components/BottomOptions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface GameData {
   state: (string | null)[];
@@ -27,15 +28,18 @@ export default function Game() {
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [localPlayerId, setLocalPlayerId] = useState<string | null>(null);
 
-  // Generate a unique local player ID (stored in localStorage)
+  // Generate a unique local player ID using AsyncStorage
   useEffect(() => {
-    const key = `game_${id}_playerId`;
-    let playerId = localStorage.getItem(key);
-    if (!playerId) {
-      playerId = Math.random().toString(36).substring(2, 10);
-      localStorage.setItem(key, playerId);
-    }
-    setLocalPlayerId(playerId);
+    const fetchLocalPlayerId = async () => {
+      const key = `game_${id}_playerId`;
+      let playerId = await AsyncStorage.getItem(key);
+      if (!playerId) {
+        playerId = Math.random().toString(36).substring(2, 10);
+        await AsyncStorage.setItem(key, playerId);
+      }
+      setLocalPlayerId(playerId);
+    };
+    fetchLocalPlayerId();
   }, [id]);
 
   useEffect(() => {
@@ -56,7 +60,6 @@ export default function Game() {
           filter: `id=eq.${id}`,
         },
         (payload) => {
-          console.log("Game updated:", payload.new);
           setGameData(payload.new as GameData);
         },
       )
@@ -179,7 +182,10 @@ export default function Game() {
   return (
     <>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/")}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.push("/")}
+      >
         <ThemedText type="subtitle">Back</ThemedText>
       </TouchableOpacity>
 
@@ -204,23 +210,24 @@ export default function Game() {
                 disabled={!yourTurn}
               />
             </ThemedView>
-            <ThemedText style={styles.statusText} type="subtitle">
-              {checkWinner(gameData.state)
-                ? `Winner: ${checkWinner(gameData.state)}`
-                : `Next Player: ${gameData.xIsNext ? "🐱" : "🤖"} ${
-                    yourTurn ? "(Your turn)" : "(Opponent's turn)"
-                  }`}
-            </ThemedText>
-            <TouchableOpacity
-              style={styles.restartButton}
-              onPress={() => handlePlay(Array(9).fill(null))}
-            >
-              <ThemedText type="subtitle">Restart Game</ThemedText>
-            </TouchableOpacity>
+            <ThemedView>
+              <ThemedText style={styles.statusText} type="subtitle">
+                {checkWinner(gameData.state)
+                  ? `Winner: ${checkWinner(gameData.state) === "X" ? "🐱" : "🤖"}`
+                  : `Next Player: ${gameData.xIsNext ? "🐱" : "🤖"} ${
+                      yourTurn ? "(Your turn)" : "(Opponent's turn)"
+                    }`}
+              </ThemedText>
+              <TouchableOpacity
+                style={styles.restartButton}
+                onPress={() => handlePlay(Array(9).fill(null))}
+              >
+                <ThemedText type="subtitle">Restart Game</ThemedText>
+              </TouchableOpacity>
+            </ThemedView>
           </>
         )}
       </ThemedView>
-      <BottomOptions hidden={isLandscape} />
     </>
   );
 }
@@ -254,6 +261,8 @@ const styles = StyleSheet.create({
   },
   restartButton: {
     padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
     borderColor: "#c6a0f6",
     borderWidth: 2,
     borderRadius: 10,
@@ -274,10 +283,47 @@ const stylesLandscape = StyleSheet.create({
   game: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
+    paddingHorizontal: 40,
+    paddingVertical: 20,
+    justifyContent: "space-between",
     alignItems: "center",
   },
   gameBoard: {
+    flex: 1,
     marginRight: 20,
+  },
+  title: {
+    fontSize: 32,
+    color: "#b7bdf8",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  statusText: {
+    fontSize: 20,
+    color: "#b7bdf8",
+    marginVertical: 10,
+    textAlign: "center",
+  },
+  waitingText: {
+    fontSize: 18,
+    color: "#ed8796",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  restartButton: {
+    padding: 12,
+    borderColor: "#c6a0f6",
+    borderWidth: 2,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+    backgroundColor: "#333",
+    borderRadius: 5,
   },
 });

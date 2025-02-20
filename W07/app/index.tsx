@@ -37,9 +37,8 @@ export default function Game() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "channels" },
         (payload) => {
-          console.log("New channel added:", payload);
           setChannels((prev) => [...prev, payload.new as Channel]);
-        }
+        },
       )
       .subscribe();
 
@@ -51,10 +50,8 @@ export default function Game() {
   const fetchChannels = async () => {
     const { data, error } = await supabase.from("channels").select("*");
     if (error) {
-      console.error("Error fetching channels:", error);
       setChannels([]);
     } else {
-      console.log("Fetched channels:", data);
       setChannels((data as Channel[]) ?? []);
     }
   };
@@ -62,16 +59,10 @@ export default function Game() {
   const createChannel = async () => {
     if (!newChannelName.trim()) return;
 
-    const { data, error } = await supabase
+    await supabase
       .from("channels")
       .insert([{ name: newChannelName }])
       .select();
-
-    if (error) {
-      console.error("Error creating channel:", error);
-    } else {
-      console.log("Created channel:", data);
-    }
 
     setNewChannelName("");
   };
@@ -88,7 +79,9 @@ export default function Game() {
   );
 
   return (
-    <ThemedView style={isLandscape ? stylesLandscape.container : styles.container}>
+    <ThemedView
+      style={isLandscape ? stylesLandscape.container : styles.container}
+    >
       {/* Title */}
       <ThemedText type="title" style={styles.title}>
         Available Boards
@@ -124,6 +117,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
+    marginTop: 25,
     fontSize: 28,
     color: "#b7bdf8",
     marginBottom: 20,

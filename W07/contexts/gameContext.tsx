@@ -57,10 +57,9 @@ export const GameProvider = ({ children }: PropsWithChildren) => {
 
       await sound.getStatusAsync();
       await sound.playAsync();
-      // eslint-disable-next-line no-console
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.log("Error playing sound", err);
+      console.error(err);
     }
   };
 

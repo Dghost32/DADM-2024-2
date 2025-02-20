@@ -22,22 +22,18 @@ const BottomOptions = ({ hidden }: Props) => {
   const styles = getStyles(bottom);
 
   return (
-    <ThemedView style={!hidden ? styles.container : {
-      //make it a sidebar on the right
-      ...styles.container,
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      right: 0,
-      left: undefined,
-      padding: 10,
-      paddingTop: 20,
-      paddingBottom: 20,
-      paddingHorizontal: 10,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-    }}>
+    <ThemedView
+      style={
+        !hidden
+          ? styles.container
+          : {
+              //make it a sidebar on the right
+              // hidden
+              //
+              display: "none",
+            }
+      }
+    >
       <Pressable
         style={styles.option}
         onPress={() => {
